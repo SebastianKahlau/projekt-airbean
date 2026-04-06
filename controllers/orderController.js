@@ -1,7 +1,7 @@
 const db = require("../models/db");
 
 function createOrder(req, res, next) {
-  const { userId, items } = req.body;
+  const { userId, items, promoCode } = req.body;
 
   db.get("SELECT * FROM users WHERE id = ?", [userId], (err, user) => {
     if (err) return next(err);
@@ -39,6 +39,15 @@ function createOrder(req, res, next) {
           };
         });
 
+        let discount = 0;
+        let campaignApplied = null;
+
+        if (promoCode === "DISCOUNT10") {
+          discount = Math.round(totalPrice * 0.1);
+          totalPrice = totalPrice - discount;
+          campaignApplied = "DISCOUNT10";
+        }
+
         const createdAt = new Date().toISOString();
         const status = "received";
 
@@ -69,6 +78,8 @@ function createOrder(req, res, next) {
                   id: orderId,
                   userId,
                   totalPrice,
+                  discount,
+                  campaignApplied,
                   status,
                   createdAt,
                   items: detailedItems,

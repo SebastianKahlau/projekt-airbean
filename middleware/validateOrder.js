@@ -1,5 +1,5 @@
 function validateOrder(req, res, next) {
-  const { userId, items } = req.body || {};
+  const { userId, items, promoCode } = req.body || {};
 
   if (!userId) {
     return res.status(400).json({ error: "userId is required" });
@@ -15,16 +15,22 @@ function validateOrder(req, res, next) {
 
   for (const item of items) {
     if (typeof item.productId !== "number") {
-      return res
-        .status(400)
-        .json({ error: "Each item must contain a numeric productId" });
+      return res.status(400).json({
+        error: "Each item must contain a numeric productId",
+      });
     }
 
     if (!Number.isInteger(item.quantity) || item.quantity < 1) {
-      return res
-        .status(400)
-        .json({ error: "Each item must contain a quantity of at least 1" });
+      return res.status(400).json({
+        error: "Each item must contain a quantity of at least 1",
+      });
     }
+  }
+
+  if (promoCode && typeof promoCode !== "string") {
+    return res.status(400).json({
+      error: "promoCode must be a string",
+    });
   }
 
   next();

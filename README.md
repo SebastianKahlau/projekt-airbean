@@ -1,30 +1,28 @@
 # Airbean API
 
-Det här projektet är ett REST API för Airbean, där användare kan se en meny, skapa ett konto och lägga beställningar. Beställningarna sparas i en databas och kopplas till rätt användare via användar-ID.
+Detta projekt är ett REST API för en kaffebeställnings-app (Airbean). Användare kan se en meny, skapa konto och lägga beställningar. Alla beställningar sparas i en databas och kopplas till en användare.
 
 Projektet är byggt med Node.js, Express och SQLite.
 
-## Hur man startar projektet
+---
 
-Först installerar man dependencies:
+## Kom igång
 
-```bash
+Installera dependencies:
+
 npm install
-```
 
-Sedan startar man servern med:
+Starta servern:
 
-```bash
 npm run dev
-```
 
 Servern körs på:
 
-```text
 http://localhost:3000
-```
 
-## Tekniker som använts
+---
+
+## Tekniker
 
 - Node.js
 - Express
@@ -32,47 +30,32 @@ http://localhost:3000
 - UUID
 - Nodemon
 
+---
+
 ## Databas
 
 Projektet använder fyra tabeller:
 
-- `users`
-- `products`
-- `orders`
-- `order_items`
+- users (användare)
+- products (meny)
+- orders (beställningar)
+- order_items (produkter i en beställning)
 
-`users` används för att spara användare.
-`products` innehåller menyprodukterna.
-`orders` innehåller själva beställningen.
-`order_items` innehåller vilka produkter som finns i varje beställning.
+---
 
-## API-endpoints
+## API Endpoints
 
 ### Hämta meny
 
-```text
 GET /api/menu
-```
 
-Exempel på svar:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Bryggkaffe",
-    "price": 39
-  }
-]
-```
+---
 
 ### Skapa användare
 
-```text
 POST /api/users
-```
 
-Exempel på body:
+Body:
 
 ```json
 {
@@ -80,26 +63,13 @@ Exempel på body:
 }
 ```
 
-Exempel på svar:
-
-```json
-{
-  "success": true,
-  "user": {
-    "id": "uuid...",
-    "username": "Sebbe",
-    "created_at": "..."
-  }
-}
-```
+---
 
 ### Skapa order
 
-```text
 POST /api/orders
-```
 
-Exempel på body:
+Body:
 
 ```json
 {
@@ -111,71 +81,76 @@ Exempel på body:
 }
 ```
 
-Exempel på svar:
+---
+
+### Skapa order med kampanj
 
 ```json
 {
-  "success": true,
-  "order": {
-    "id": 1,
-    "userId": "uuid...",
-    "totalPrice": 127,
-    "status": "received",
-    "createdAt": "...",
-    "items": [
-      { "productId": 1, "quantity": 2, "itemPrice": 39 },
-      { "productId": 2, "quantity": 1, "itemPrice": 49 }
-    ]
-  }
+  "userId": "uuid...",
+  "items": [{ "productId": 1, "quantity": 2 }],
+  "promoCode": "DISCOUNT10"
 }
 ```
 
-### Hämta en specifik order
+Om `DISCOUNT10` används ges 10% rabatt på totalpriset.
 
-```text
+---
+
+### Hämta en order
+
 GET /api/orders/:orderId
-```
 
-### Hämta orderhistorik för en användare
+---
 
-```text
+### Hämta orderhistorik
+
 GET /api/orders/user/:userId
-```
+
+---
 
 ## Validering
 
-Projektet innehåller middleware för att kontrollera inkommande data.
+API:et kontrollerar att:
 
-Det som kontrolleras är bland annat:
+- userId finns
+- items är en array
+- productId är giltigt
+- quantity är minst 1
+- produkterna finns i menyn
 
-- att `userId` finns med
-- att `items` är en array
-- att `productId` är giltigt
-- att `quantity` är minst 1
-- att produkterna faktiskt finns i menyn
+Vid fel returneras ett felmeddelande.
 
-Om något är fel returneras ett felmeddelande.
+---
 
-Exempel:
+## Hur priset beräknas
 
-```json
-{
-  "error": "One or more products do not exist in the menu"
-}
-```
+Priset räknas alltid i backend baserat på produkterna i databasen. Klienten kan alltså inte påverka priset själv.
 
-## Hur priset hanteras
+---
 
-Priset räknas ut i backend och hämtas från databasen. Det betyder att klienten inte själv kan bestämma priset i en order. Det gör att datan blir säkrare och mer korrekt.
+## Kampanjfunktion
 
-## WebSocket-resonemang
+API:et har stöd för en kampanj via `promoCode`.
 
-Jag har inte implementerat WebSockets i projektet, men det hade kunnat användas för att ge användaren uppdateringar i realtid. Till exempel hade man kunnat visa när ordern tas emot, när den förbereds och när leveransen är på väg. Det hade gett en bättre användarupplevelse eftersom man hade sluppit uppdatera sidan manuellt för att se status.
+- DISCOUNT10 → ger 10% rabatt
+
+Rabatten beräknas i backend.
+
+---
+
+## WebSockets
+
+WebSockets har inte implementerats eftersom projektet inte kräver realtidsuppdateringar. Ett REST API räcker för att skapa och hämta data. WebSockets hade kunnat användas för att visa orderstatus i realtid.
+
+---
 
 ## Arbetsmetod
 
-Projektet har gjorts som ett grupparbete. Vi har använt Git för versionshantering och delat upp arbetet i olika delar. User stories och tasks har använts för att planera arbetet.
+Ensam i detta projekt.
+
+---
 
 ## Författare
 
-Grupprojekt i kursen Frontendutveckling.
+Sebastian Kahlau.
